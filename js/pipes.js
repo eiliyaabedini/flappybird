@@ -209,11 +209,18 @@ class Pipes {
      */
     checkPipePassed(bird) {
         for (let pipe of this.pipes) {
-            // Check if the bird's front edge has passed the pipe's center and the pipe hasn't been passed yet
+            // Check if the bird's front edge (bird.x) has passed the pipe's center line (pipeCenterX)
+            // and the pipe hasn't been scored yet (!pipe.passed).
             const pipeCenterX = pipe.x + this.pipeWidth / 2;
+
+            // Debug log for every check against an unpassed pipe
+            // if (!pipe.passed) {
+            //     console.log(`[Pipe Check] Bird X: ${bird.x.toFixed(1)}, Pipe Center X: ${pipeCenterX.toFixed(1)}, Pipe Passed: ${pipe.passed}`);
+            // }
+
             if (!pipe.passed && bird.x > pipeCenterX) {
-                pipe.passed = true; // Mark as passed
-                console.log("Pipe passed!");
+                pipe.passed = true; // Mark this pipe as passed to prevent multiple scores
+                console.log(`[SCORE] Pipe Passed! Bird X: ${bird.x.toFixed(1)} > Pipe Center X: ${pipeCenterX.toFixed(1)}. Setting pipe.passed = true.`);
                 return true; // Signal that a point should be scored
             }
         }

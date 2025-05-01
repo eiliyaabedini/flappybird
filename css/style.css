@@ -167,3 +167,44 @@ body {
     /* Style differently when muted */
     opacity: 0.6; /* Make it dimmer */
 }
+
+/* Time Indicator Styling */
+.ui-indicator {
+    background-color: rgba(0, 0, 0, 0.6); /* Match button background */
+    color: white; /* Default text color */
+    border: 1px solid #aaa; /* Match button border */
+    border-radius: 5px; /* Match button border-radius */
+    padding: 8px 10px; /* Match button padding */
+    font-size: 1.5em; /* Match button font size */
+    line-height: 1; /* Match button line-height */
+    z-index: 20; /* Match button z-index */
+    transition: background-color 0.5s ease, color 0.5s ease, opacity 0.2s ease; /* Smooth transitions */
+    cursor: default; /* Indicate it's not clickable (unless functionality is added later) */
+}
+
+#time-indicator {
+    position: absolute;
+    top: 15px; /* Same distance from top as music button */
+    left: 15px; /* Position on the left */
+}
+
+#time-indicator:hover {
+    opacity: 0.85; /* Slightly fade on hover for feedback */
+}
+
+/* Time-specific styles */
+#time-indicator.day {
+    color: #FFEB3B; /* Yellow for sun */
+}
+
+#time-indicator.dusk {
+    color: #FFA726; /* Orange for sunset */
+}
+
+#time-indicator.night {
+    color: #B0BEC5; /* Light blue/gray for moon */
+}
+
+#time-indicator.dawn {
+    color: #FFCC80; /* Lighter orange for sunrise */
+}

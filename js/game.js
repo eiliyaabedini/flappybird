@@ -50,9 +50,8 @@ class Game {
         // Placeholder for Particle System (Requires js/particles.js)
         // this.particleManager = null;
 
-        // Placeholder for Day/Night Cycle (Requires changes in js/background.js)
-        // this.gameTime = 0;
-        // this.dayDuration = 60; // seconds for a full day cycle
+        // Day/Night Cycle Manager
+        this.timeManager = null; // Initialize TimeManager property
 
         this.updateLogCounter = 0; // Counter for periodic logging
         this.musicPlayer = null; // Initialize music player property
@@ -68,9 +67,9 @@ class Game {
      */
     forceSimpleMode() {
         if (!this.simpleMode) {
-            this.simpleMode = true;
-            this.assetLoader.enableSimpleMode(); // Ensure asset loader is also in simple mode
-            console.warn("[Game] Forced Simple Mode Enabled. Using fallback graphics and no sound.");
+//            this.simpleMode = true;
+//            this.assetLoader.enableSimpleMode(); // Ensure asset loader is also in simple mode
+//            console.warn("[Game] Forced Simple Mode Enabled. Using fallback graphics and no sound.");
             // Potentially disable other features reliant on assets or performance
             // e.g., particle effects, complex animations
             // if (this.particleManager) this.particleManager.disable();
@@ -175,6 +174,20 @@ class Game {
             console.warn("[GAME_INIT] MusicPlayer class not found. Background music disabled.");
         }
 
+        // Initialize Time Manager
+        if (window.TimeManager) {
+            try {
+                this.timeManager = new TimeManager(60); // Use a 5-second cycle for faster day/night transitions
+                console.log("[GAME_INIT] TimeManager initialized.");
+            } catch (e) {
+                console.error("[GAME_INIT] Failed to initialize TimeManager:", e);
+                this.timeManager = null;
+            }
+        } else {
+            console.warn("[GAME_INIT] TimeManager class not found. Day/night cycle disabled.");
+        }
+
+
         console.log("[GAME_INIT] Game components initialized.");
         // Game state will be set to 'ready' by the start method after loading completes.
     }
@@ -235,6 +248,22 @@ class Game {
         // Convert deltaTime from milliseconds to seconds for physics calculations
         const dtSeconds = deltaTime / 1000;
 
+        // --- Update Time Manager and Background Cycle (if applicable) ---
+        // Do this before state-specific updates that might depend on time of day
+        if (this.gameState !== 'loading' && this.gameState !== 'error' && this.timeManager && !this.simpleMode) {
+            this.timeManager.update(dtSeconds);
+            const timeState = this.timeManager.getTimeState();
+
+            // Pass time state to background for visual updates
+            if (this.background && typeof this.background.updateCycle === 'function') {
+                try {
+                    this.background.updateCycle(timeState); // Pass the whole state object
+                } catch (e) {
+                    console.warn("[Game Update] Error calling background.updateCycle.", e);
+                }
+            }
+        }
+
         // Update effects timers regardless of state (for fade-outs)
         if (this.flashOpacity > 0) {
             this.flashOpacity -= dtSeconds / this.flashDuration;
@@ -285,15 +314,8 @@ class Game {
             }
             // --- End Periodic Logging ---
 
-            // Update Day/Night Cycle (Placeholder) - Skip in simple mode
-            // if (!this.simpleMode) {
-                // this.gameTime += dtSeconds;
-                // if (this.gameTime > this.dayDuration) this.gameTime = 0;
-                // const cycleProgress = this.gameTime / this.dayDuration;
-                // if (this.background) this.background.updateCycle(cycleProgress); // Needs implementation in Background
-            // }
-
             // Update background (full speed or static in simple mode), bird, and pipes
+            // TimeManager and background.updateCycle are now handled earlier
             const backgroundSpeedMultiplier = this.simpleMode ? 0 : 1; // No scroll in simple mode
             if (this.background) {
                 try {
@@ -338,8 +360,8 @@ class Game {
 
             // Check if bird passed a pipe
             if (this.pipes && this.bird && this.scoreManager && this.pipes.checkPipePassed(this.bird)) {
-                this.scoreManager.incrementScore(); // ScoreManager's sound will be skipped if AssetLoader is in simpleMode
-                // console.log(`[SCORE] Score incremented to: ${this.scoreManager.getScore()}`); // Logged in ScoreManager
+                console.log(`[SCORE_EVENT] Pipe passed by bird at x=${this.bird.x.toFixed(1)}, y=${this.bird.y.toFixed(1)}. Incrementing score.`);
+                this.scoreManager.incrementScore(); // ScoreManager handles sound and visual pop animation trigger
 
                 // --- Difficulty Progression --- (Keep difficulty progression even in simple mode)
                 const currentScore = this.scoreManager.getScore();
@@ -526,6 +548,7 @@ class Game {
             // ScoreManager needs its own fallback logic if its assets fail
             // Assuming ScoreManager.draw() handles missing assets or simpleMode gracefully
             try {
+                // console.log(`[DEBUG_RENDER] Calling scoreManager.draw() in 'playing' state.`); // Optional: uncomment for intense debugging
                 this.scoreManager.draw();
             } catch (e) {
                 console.warn("[Render] Error drawing score. Drawing fallback.", e);
@@ -932,11 +955,14 @@ class Game {
         // Reset Particles (Placeholder) - Skip in simple mode
         // if (this.particleManager && !this.simpleMode) this.particleManager.reset();
 
-        // Reset Day/Night Cycle (Placeholder) - Skip in simple mode
-        // if (!this.simpleMode) {
-            // this.gameTime = 0;
-            // if (this.background) this.background.setCycle('day'); // Or reset to default
-        // }
+        // Reset Day/Night Cycle
+        if (this.timeManager) {
+            this.timeManager.reset();
+            // Update background immediately to day state if applicable
+            if (this.background && typeof this.background.updateCycle === 'function' && !this.simpleMode) {
+                 this.background.updateCycle(this.timeManager.getTimeState());
+            }
+        }
 
         // Reset game state
         this.gameState = 'ready';

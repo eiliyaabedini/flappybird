@@ -23,15 +23,17 @@ class ScoreManager {
         this.strokeColor = "black"; // Outline color
         this.lineWidth = 2;         // Outline width
         this.x = canvasWidth / 2;   // Center horizontally
-        this.y = 60;                // Position slightly lower
+        this.y = 60;                // Position near the top-center
 
-        // Animation properties
+        // Score "Pop" Animation properties
         this.displayScore = 0;      // Score value visually displayed (can lag behind actual score for effect)
         this.scoreScale = 1.0;      // Current scale for animation
         this.scoreScaleTarget = 1.0;// Target scale for animation
-        this.scoreScaleSpeed = 4.0; // How fast the scale animates (higher is faster)
+        this.scoreScaleSpeed = 4.0; // How fast the scale animates (higher is faster) - Increased from default
+        this.scoreColor = "white";  // Base color
+        this.popColor = "#FFD700"; // Gold color during pop - Optional
 
-        // High score pulse properties
+        // High score pulse properties (Separate from score pop)
         this.isNewHighScore = false;
         this.highScorePulseScale = 1.0;
         this.highScorePulseSpeed = 2.0; // Speed of pulsing
@@ -53,13 +55,15 @@ class ScoreManager {
      * Typically called when the bird successfully passes a pipe.
      */
     incrementScore() {
+        const oldScore = this.score;
         this.score++;
-        this.scoreScaleTarget = 1.5; // Target scale for the "pop" effect
+        this.scoreScaleTarget = 1.5; // Target scale for the "pop" effect - Increased from 1.0
+        console.log(`[DEBUG_SCORE] Score incremented from ${oldScore} to ${this.score}. Triggering pop animation (target scale: ${this.scoreScaleTarget}).`);
+
         // Play score sound
         if (this.assetLoader) {
             this.assetLoader.playSound('score', 0.8); // Play score sound at 80% volume
         }
-        // console.log(`Score increased: ${this.score}`);
     }
 
     /**
@@ -68,23 +72,26 @@ class ScoreManager {
      * @param {number} deltaTime - Time elapsed since the last frame in seconds.
      */
     update(deltaTime) {
-        // Animate score scale
+        // --- Animate Score Scale (Pop Effect) ---
         if (this.scoreScale !== this.scoreScaleTarget) {
             const diff = this.scoreScaleTarget - this.scoreScale;
             this.scoreScale += diff * this.scoreScaleSpeed * deltaTime;
 
-            // If the target was larger (pop effect) and we are returning to normal
+            // Check if the animation is returning to normal scale after a pop
+            // If the target was > 1 (a pop), and the difference is now negative (moving back towards 1),
+            // and we are close enough to 1, snap back and reset the target.
             if (this.scoreScaleTarget > 1.0 && diff < 0 && this.scoreScale < 1.05) {
-                this.scoreScale = 1.0; // Snap back to 1
-                this.scoreScaleTarget = 1.0; // Reset target
+                // console.log(`[DEBUG_SCORE_ANIM] Snapping scale back to 1.0 from ${this.scoreScale.toFixed(2)}`);
+                this.scoreScale = 1.0;
+                this.scoreScaleTarget = 1.0; // Reset target to normal scale
             }
-            // If the target was 1.0 (resetting) and we are close
-            else if (this.scoreScaleTarget === 1.0 && Math.abs(diff) < 0.01) {
-                 this.scoreScale = 1.0; // Snap to 1
+            // If the target was already 1.0 (e.g., after reset) and we are very close, snap to 1.0
+            else if (this.scoreScaleTarget === 1.0 && Math.abs(1.0 - this.scoreScale) < 0.01) {
+                 this.scoreScale = 1.0;
             }
         }
 
-        // Animate high score pulse if new high score was achieved
+        // --- Animate High Score Pulse (Separate Effect) ---
         if (this.isNewHighScore) {
             this.highScorePulseScale += this._pulseDirection * this.highScorePulseSpeed * deltaTime;
             if (this.highScorePulseScale >= this.highScorePulseMax) {
@@ -102,37 +109,46 @@ class ScoreManager {
 
         // Update display score (optional, could just use this.score)
         this.displayScore = this.score;
+
+        // Debug log for animation state
+        // console.log(`[DEBUG_SCORE_UPDATE] Score: ${this.score}, Display: ${this.displayScore}, Scale: ${this.scoreScale.toFixed(2)}, Target: ${this.scoreScaleTarget}, PulseScale: ${this.highScorePulseScale.toFixed(2)}`);
     }
 
     /**
      * Draws the current score onto the canvas, applying animation scale and outline.
      */
     draw() {
-        this.ctx.save(); // Save context state
+        this.ctx.save(); // Save context state before applying transformations and styles
 
-        // Apply scale transformation for animation
-        this.ctx.translate(this.x, this.y); // Move origin to score position
-        this.ctx.scale(this.scoreScale, this.scoreScale); // Apply scale
-        this.ctx.translate(-this.x, -this.y); // Move origin back
+        // Apply scale transformation for the pop animation
+        // Translate origin to the score's position, scale, then translate back
+        this.ctx.translate(this.x, this.y);
+        this.ctx.scale(this.scoreScale, this.scoreScale);
+        this.ctx.translate(-this.x, -this.y);
 
         // Style the text
-        this.ctx.fillStyle = this.color;
+        // Optional: Change color during pop animation peak
+        // this.ctx.fillStyle = (this.scoreScale > 1.1) ? this.popColor : this.scoreColor;
+        this.ctx.fillStyle = this.scoreColor; // Keep color consistent for now
         this.ctx.strokeStyle = this.strokeColor;
         this.ctx.lineWidth = this.lineWidth;
         this.ctx.font = this.font;
         this.ctx.textAlign = "center";
-        this.ctx.textBaseline = "middle"; // Align vertically better
+        this.ctx.textBaseline = "middle"; // Better vertical alignment
 
         const scoreText = this.displayScore.toString();
 
-        // Draw outline first
+        // Draw outline first for better visibility
         this.ctx.strokeText(scoreText, this.x, this.y);
         // Draw filled text on top
         this.ctx.fillText(scoreText, this.x, this.y);
 
-        this.ctx.restore(); // Restore context state (removes scale)
+        this.ctx.restore(); // Restore context state (removes scale and style changes)
 
-        // Note: High score display during gameplay is handled in game.js render()
+        // Debug log for drawing state (uncomment if needed)
+        // console.log(`[DEBUG_SCORE_DRAW] Drawing score: ${scoreText} at (${this.x}, ${this.y}), Scale: ${this.scoreScale.toFixed(2)}`);
+
+        // Note: High score display during gameplay is handled separately in game.js render()
     }
 
     /**
