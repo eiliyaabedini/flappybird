@@ -357,6 +357,10 @@ class Game {
             // Update Particles (Placeholder)
             // if (this.particleManager) this.particleManager.update(dtSeconds);
 
+            // Update score manager animations
+            if (this.scoreManager) {
+                this.scoreManager.update(dtSeconds);
+            }
 
             // Check if bird passed a pipe
             if (this.pipes && this.bird && this.scoreManager && this.pipes.checkPipePassed(this.bird)) {
