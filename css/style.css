@@ -1,0 +1,169 @@
+/* Import a pixel-art friendly font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%; /* Ensure html and body take full height */
+    overflow: hidden; /* Prevent scrollbars on body */
+}
+
+body {
+    background-color: #1a1a1a; /* Slightly darker background */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Press Start 2P', cursive;
+    color: #eee; /* Light gray text */
+    text-align: center; /* Center text by default */
+    padding: 10px; /* Add some padding around the container */
+}
+
+#game-container {
+    position: relative; /* Needed for absolute positioning of overlay */
+    display: flex;
+    flex-direction: column; /* Stack title, canvas, instructions vertically */
+    align-items: center; /* Center items horizontally */
+    width: auto; /* Allow container to size based on content */
+    max-width: 100%; /* Prevent container from exceeding screen width */
+}
+
+.game-title {
+    font-size: 2em; /* Adjust size as needed */
+    color: #FFD700; /* Gold color */
+    text-shadow: 2px 2px #000; /* Simple text shadow */
+    margin-bottom: 15px; /* Space below title */
+}
+
+#game-canvas {
+    border: 2px solid #444; /* Darker border */
+    display: block;
+    background-color: #000; /* Black background until game draws */
+    max-width: 100%; /* Ensure canvas scales down on small screens */
+    height: auto; /* Maintain aspect ratio when scaling */
+    /* Ensure crisp pixels, important for pixel art */
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast; /* Better for WebKit */
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    /* Set explicit size for layout, game logic uses internal size */
+    width: 288px;
+    height: 512px;
+}
+
+.instructions {
+    margin-top: 15px; /* Space above instructions */
+    font-size: 0.9em;
+    color: #aaa; /* Lighter gray for instructions */
+}
+
+/* Loading Overlay */
+#loading-overlay {
+    position: absolute; /* Cover the canvas area */
+    top: 0; /* Align to the top of the container */
+    left: 50%; /* Start at horizontal center */
+    transform: translateX(-50%); /* Correct horizontal centering */
+    width: 288px; /* Match canvas width */
+    height: 512px; /* Match canvas height */
+    background-color: rgba(0, 0, 0, 0.85); /* Dark semi-transparent background */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10; /* Ensure it's above the canvas */
+    color: #fff;
+    font-size: 1.2em;
+    border: 2px solid #444; /* Match canvas border */
+    /* Initially visible, will be hidden by JS */
+}
+
+#loading-overlay.hidden {
+    display: none; /* Hide when loading is complete */
+}
+
+/* Simple CSS Spinner */
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3); /* Light border */
+    border-radius: 50%;
+    border-top: 4px solid #fff; /* White top border */
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite; /* Animation */
+    margin-bottom: 15px; /* Space between spinner and text */
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* NoScript / Error Message Styling */
+.error-message {
+    margin-top: 20px;
+    color: #ff4d4d; /* Red color for errors */
+    font-size: 1em;
+    border: 1px solid #ff4d4d;
+    padding: 10px;
+    background-color: rgba(255, 77, 77, 0.1);
+}
+
+/* Responsive adjustments (optional, game itself is fixed size) */
+@media (max-width: 320px) {
+    .game-title {
+        font-size: 1.5em;
+    }
+    #game-canvas {
+        /* Allow canvas to shrink slightly if needed, though fixed size is often preferred for pixel games */
+        /* width: 100%; */
+    }
+    .instructions {
+        font-size: 0.8em;
+    }
+}
+
+@media (max-height: 600px) {
+     .game-title {
+        font-size: 1.5em;
+        margin-bottom: 10px;
+    }
+     .instructions {
+        font-size: 0.8em;
+        margin-top: 10px;
+    }
+    /* Consider hiding title/instructions on very short screens if needed */
+}
+
+/* UI Button Styling - General */
+.ui-button {
+    background-color: rgba(0, 0, 0, 0.6); /* Slightly darker semi-transparent black */
+    color: white;
+    border: 1px solid #aaa; /* Lighter border for contrast */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+    line-height: 1; /* Ensure icon fits vertically */
+    z-index: 20; /* Ensure it's above loading overlay and canvas */
+}
+
+.ui-button:hover {
+    background-color: rgba(50, 50, 50, 0.8); /* Slightly lighter on hover */
+}
+
+/* Specific Styling for Music Toggle Button */
+#music-toggle {
+    position: absolute;
+    top: 15px; /* Position further down from the top edge */
+    right: 15px; /* Position further left from the right edge */
+    padding: 8px 10px; /* Larger padding for easier clicking */
+    font-size: 1.5em; /* Larger icon */
+}
+
+#music-toggle.muted {
+    /* Style differently when muted */
+    opacity: 0.6; /* Make it dimmer */
+}

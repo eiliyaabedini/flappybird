@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Ensure proper rendering and touch zooming -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- SEO and Sharing Meta Tags -->
+    <title>Flappy Bird Clone</title>
+    <meta name="description" content="A simple Flappy Bird clone game built with HTML, CSS, and JavaScript.">
+    <meta name="keywords" content="flappy bird, game, javascript, html5, canvas">
+    <!-- Open Graph tags for social media sharing -->
+    <meta property="og:title" content="Flappy Bird Clone">
+    <meta property="og:description" content="Play a simple Flappy Bird clone game online.">
+    <!-- <meta property="og:image" content="url/to/your/game_preview.jpg"> -->
+    <!-- <meta property="og:url" content="url/to/your/game"> -->
+    <meta property="og:type" content="website">
+
+    <!-- Favicon Link (replace 'favicon.ico' if you use a different name/type) -->
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-container">
+        <h1 class="game-title">Flappy Bird</h1>
+        <div id="loading-overlay">
+            <div class="spinner"></div>
+            <p>Loading Game...</p>
+        </div>
+        <canvas id="game-canvas" width="288" height="512">
+            <!-- Fallback content for browsers that don't support Canvas -->
+            Your browser does not support the HTML5 canvas tag.
+        </canvas>
+        <p class="instructions">Tap / Space / Click to Flap</p>
+        <noscript>
+            <p class="error-message">This game requires JavaScript to run. Please enable JavaScript in your browser settings.</p>
+        </noscript>
+    </div>
+
+    <!-- Load assets first -->
+    <script src="js/assets.js"></script>
+    <script src="js/music.js"></script> <!-- Background Music Player -->
+
+    <!-- Load game entities -->
+    <script src="js/bird.js"></script>
+    <script src="js/pipes.js"></script>
+
+    <!-- Load game components -->
+    <script src="js/background.js"></script>
+    <script src="js/score.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/collision.js"></script> <!-- Collision detection logic -->
+
+
+    <!-- Load main game logic -->
+    <script src="js/game.js"></script>
+
+    <!-- Load UI components -->
+    <script src="js/ui.js"></script>
+</body>
+</html>
