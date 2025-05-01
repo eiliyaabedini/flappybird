@@ -76,7 +76,33 @@ flappybird/
 ## How to Run
 Open `index.html` in a modern web browser.
 
-## Controls
-- Click or press Spacebar to make the bird flap
-- Press R to restart the game after game over
+----
+
+This is a project made by Claude Desktop and Desktop Commander MCP + Aider MCP (with paralel runs)
+
+## Prompt for this project:
+```
+create a flappy bird game
+
+But I want you first to think deep and plan the project,
+Then create multiple tasks that can be done simultiniously in paralel which means no tasks should have dependency to each others, and tasks should be small and limited to one file,
+Create a readme file that contains information about the project and tasks,
+for each tasks share the readme and dependency files needed to **code_with_multiple_ai** tool so it can has knowledge about it 
+For coding use **code_with_multiple_ai** but just run 4 tasks at same time,
+which they are not dependet on each others,
+I suggest you to create taks branches, which each branch work on different part of the app and they have no dependency, then run tasks one by one from different branches together, (like task 1 of different branches at same time, then task 2 and ...)
+
+consider small tasks, and consider developing the app step by step,
+which means, I need to have sprints,
+after each sprint we need to have a runnable game, and I want you to use browser tool to run it so we can see,
+for example sprint 1 can just load the game with nothing inside (but proper working)
+then sprint 2, we might have the bird that can jump, with no wall 
+then sprint 3 we add the walls and movements 
+....
+So all the time I can see the result.
+
+if you need to run any command line, use your command line tool, don't give command running to our coder it can't run commands, it can just code 
+don't code yourself, even if you need to review and if you find something is wrong don't fix it yourself, ask code_with_ai to fix it
+if you found it is doing some mistakes all the time, then create a rule for it, and as part of prompt give it to it in next time run.
+Also consider giving each task the methods and interfaces , method name, inputs and outputs, this way when they connect to eachother they don't have issue
 ```
