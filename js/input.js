@@ -77,6 +77,11 @@ class InputHandler {
         // Also prevents default touch actions like scrolling
         event.preventDefault();
         this._handleAction();
+
+        if (this.game.gameState === 'gameover') {
+            console.log("Restarting game via 'R' key."); // Debug log
+            this.game.restart();
+        }
     }
 
     /**
@@ -91,9 +96,13 @@ class InputHandler {
             console.log("Spacebar pressed."); // Debug log
             this._handleAction();
             event.preventDefault(); // Prevent spacebar from scrolling the page
+        }
 
+        // Restart on 'R' key during gameover
+        if (event.code === 'KeyR' || event.keyCode === 82) { // keyCode for older browsers
+            console.log("'R' key pressed."); // Debug log
             if (this.game.gameState === 'gameover') {
-                console.log("To restarting press 'Space' or Tap on the screen"); // Debug log
+                console.log("Restarting game via 'R' key."); // Debug log
                 this.game.restart();
             }
         }
